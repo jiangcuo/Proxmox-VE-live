@@ -3,9 +3,9 @@ arch="amd64"
 release="bullseye"
 rootfssrc="/tmp/rootfssrc"
 localfile="/root/local"
+pve_initrd=`ls /tmp/boot/initrd*|head -n 1`
 
 mv $rootfssrc/boot /tmp
-pve_initrd=`ls /tmp/boot/initrd*|head -n 1`
 rm /tmp/boot/initrd.img.gz 
 rm /tmp/boot/initrd.img
 cp $pve_initrd /tmp/boot/initrd.img.gz 
