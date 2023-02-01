@@ -6,34 +6,42 @@ errlog(){
 	fi
 }
 
-local_mount_root()
-{
+local_mount_root(){
 #创建临时挂载点
-mkdir /mnt
-mount -nt proc proc /proc
+	mkdir /mnt
+	mount -nt proc proc /proc
 #如果识别到pxe启动的proxmox.iso，则将这个iso挂载。如果是本地启动，则将Lable为PVE的盘挂载。
-pvelive=$(blkid  -L PVE|head -n 1)
-if [ -f /proxmox.iso ];then
-mount -t iso9660 -o loop,ro /proxmox.iso /mnt || errlog "mount proxmoxiso failed"
-else
-mount -t iso9660 -o loop,ro $pvelive /mnt 
-fi
-if [ $? = 1 ];then
-echo "mount pverom as iso9660 failed" 
-echo "try mount as vfat"
-mount -t vfat -o loop,ro $pvelive /mnt || errlog "mount pverom as vfat failed"
-fi
+	pvelive=$(blkid  -L PVE|head -n 1)
+	if [ -f /proxmox.iso ];then
+		mount -t iso9660 -o loop,ro /proxmox.iso /mnt || errlog "mount proxmoxiso failed"
+	else
+		mount -t iso9660 -o loop,ro $pvelive /mnt || mount -t vfat -o loop,ro $pvelive /mnt 
+	fi
+
 
 #判断是否有tmpfssize，如果有则设置tmpfssize
-if [ ! -n "$tmpfssize" ];then
-mount -t tmpfs tmpfs /mnt/.workdir || errlog "mount tmpfs failed"
-else
-mount -t tmpfs -o size=$tmpfssize tmpfs /mnt/.workdir ||  errlog "mount tmpfs with size $tmpfssize failed"
-fi
+	if [ ! -n "$tmpfssize" ];then
+		mount -t tmpfs tmpfs /mnt/.workdir || errlog "mount tmpfs failed"
+	else
+		mount -t tmpfs -o size=$tmpfssize tmpfs /mnt/.workdir ||  errlog "mount tmpfs with size $tmpfssize failed"
+	fi
+
 #创建overlay挂载
-mkdir /mnt/.workdir/upper
-mkdir /mnt/.workdir/work
-mount -t squashfs -o ro,loop "/mnt/pve-base.squashfs" /mnt/.base || errlog "mount pvebase failed"
-mount -t overlay -o lowerdir=/mnt/.base,upperdir=/mnt/.workdir/upper,workdir=/mnt/.workdir/work  none /root || errlog "mount pvebase to /root failed"
-mount -t devtmpfs devtmpfs /root/dev
+	mkdir /mnt/.workdir/upper
+	mkdir /mnt/.workdir/work
+	mount -t squashfs -o ro,loop "/mnt/pve-base.squashfs" /mnt/.base || errlog "mount pvebase failed"
+	mount -t overlay -o lowerdir=/mnt/.base,upperdir=/mnt/.workdir/upper,workdir=/mnt/.workdir/work  none /root || errlog "mount pvebase to /root failed"
+	mount -t devtmpfs devtmpfs /root/dev
+
+#判断hostname
+	if [ -n "$hostname" ];then
+		echo "$hostname" >/root/etc/hosts
+	fi
+
+#判断是否有pvedata
+	pvedata=$(blkid  -L pvedata|head -n 1)
+	if [ ! -n "$pvedata" ];then
+		rm /root/etc/systemd/system/multi-user.target.wants/var-lib-pve\\x2dcluster.mount
+	fi
+
 }
