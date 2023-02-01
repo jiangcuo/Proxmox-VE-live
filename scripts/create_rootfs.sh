@@ -29,9 +29,10 @@ errlog(){
 	fi
 }
 enable_ssh(){
-	echo "allow root login with openssh"
+	echo "allow root login"
 	sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' $rootfssrc/etc/ssh/sshd_config
 	sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' $rootfssrc/etc/ssh/sshd_config
+	sed -i 's/^#\?PermitEmptyPasswords.*/PermitEmptyPasswords yes/' $rootfssrc/etc/ssh/sshd_config
 }
 
 modify_hostname(){
@@ -49,6 +50,17 @@ ff02::3 ip6-allhosts
 EOF
 	echo "pve"> $rootfssrc/etc/hostname
 }
+
+modify_proxmox_boot_sync(){
+	sed -i 's/^/#&/' $rootfssrc/etc/initramfs/post-update.d//proxmox-boot-sync
+	sed -i '1c \#!/bin/bash' $rootfssrc/etc/initramfs/post-update.d//proxmox-boot-sync
+}
+
+restore_proxmox_boot_sync(){
+	sed -i 's/^#//' $rootfssrc/etc/initramfs/post-update.d//proxmox-boot-sync
+	sed -i '1c \#!/bin/bash' $rootfssrc/etc/initramfs/post-update.d//proxmox-boot-sync
+}
+
 
 modify_network(){
 cat << EOF > $rootfssrc/etc/network/interfaces 
@@ -99,7 +111,9 @@ modify_hostname
 prepare_rootfs_mount || errlog "rootfs env mount  failed"
 chroot $rootfssrc apt update 
 LC_ALL=C DEBIAN_FRONTEND=noninteractive chroot $rootfssrc  apt install proxmox-ve  ifenslave ifupdown -y || errlog "proxmox-ve install  failed"
-
+modify_proxmox_boot_sync
+LC_ALL=C DEBIAN_FRONTEND=noninteractive chroot $rootfssrc dpkg --configure -a
+restore_proxmox_boot_sync
 #if you wan't save your pve-cluster config. you can mount your dev to /var/lib/pve-cluster
 #defualt is mount disk which label is pvedata and type is vfat.
 
