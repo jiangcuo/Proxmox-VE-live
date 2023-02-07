@@ -152,7 +152,7 @@ local_mount_root()
 		if [ -f /proxmox.iso ];then
 			mount -t iso9660 -o loop,ro /proxmox.iso /mnt || panic "mount proxmoxiso failed"
 		else
-			mount -t iso9660 -o loop,ro $pvelive /mnt || mount -t vfat -o loop,ro $pvelive /mnt 
+			mount -t auto -o loop,ro $pvelive /mnt || panic "mount proxmoxdisk failed"
 		fi
 
 
