@@ -6,7 +6,7 @@ if [ ! -z $hostname ];then
 	echo "define the hostname,do config hostname"
 	echo $hostname >/etc/hostname
     sed -i "s/pve/$hostname/g" /etc/hosts
-	systemctl set-hostname $hostname
+	hostnamectl set-hostname $hostname
 fi
 
 if [ ! -z $dn ];then
