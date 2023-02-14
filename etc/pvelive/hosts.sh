@@ -1,18 +1,20 @@
 #!/bin/bash
-hostname=`sed "s/ /\n/g" /proc/cmdline |grep hostname`
-dn=`sed "s/ /\n/g" /proc/cmdline |grep dn`
-if [ ! -z $hostname ];then
-	export $hostname
+#on linux kernel 5,if linux cmdline contain the hostname=xx ,the initramfs will echo it to /root/etc/hosts
+#So we use HOSTNAME instead hostname
+HOSTNAME=`sed "s/ /\n/g" /proc/cmdline |grep HOSTNAME`
+DN=`sed "s/ /\n/g" /proc/cmdline |grep DN`
+if [ ! -z $HOSTNAME ];then
+	export $HOSTNAME
 	echo "define the hostname,do config hostname"
-	echo $hostname >/etc/hostname
-    sed -i "s/pve/$hostname/g" /etc/hosts
-	hostnamectl set-hostname $hostname
+	echo $HOSTNAME >/etc/hostname
+    sed -i "s/pve/$HOSTNAME/g" /etc/hosts
+	hostnamectl set-hostname $HOSTNAME
 fi
 
-if [ ! -z $dn ];then
-	export $dn
+if [ ! -z $DN ];then
+	export $DN
 	echo "define the dn,do config dn"
-	sed -i "s/testlive.com/$dn/g" /etc/hosts
+	sed -i "s/testlive.com/$DN/g" /etc/hosts
 fi
 
 exit 0
