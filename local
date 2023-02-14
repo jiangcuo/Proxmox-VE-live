@@ -147,10 +147,10 @@ local_mount_root()
 	if [ -z "${ROOT}" ]; then
 		mkdir /mnt
 		mount -nt proc proc /proc
-#如果识别到pxe启动的proxmox.iso，则将这个iso挂载。如果是本地启动，则将Lable为PVE的盘挂载。
+#如果识别到pxe启动的proxmox-live.iso，则将这个iso挂载。如果是本地启动，则将Lable为PVE的盘挂载。
 		pvelive=$(blkid  -L PVE|head -n 1)
-		if [ -f /proxmox.iso ];then
-			mount -t iso9660 -o loop,ro /proxmox.iso /mnt || panic "mount proxmoxiso failed"
+		if [ -f /proxmox-live.iso ];then
+			mount -t iso9660 -o loop,ro /proxmox-live.iso /mnt || panic "mount proxmoxiso failed"
 		else
 			mount -t auto -o loop,ro $pvelive /mnt || panic "mount proxmoxdisk failed"
 		fi
@@ -164,17 +164,19 @@ local_mount_root()
 		fi
 
 #创建overlay挂载
-		mkdir /mnt/.workdir/upper
-		mkdir /mnt/.workdir/work
-		mount -t squashfs -o ro,loop "/mnt/pve-base.squashfs" /mnt/.base || panic "mount pvebase failed"
+		mkdir /mnt/.workdir/upper /mnt/.workdir/work /mnt/.base .workdir
+		mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /mnt/.base || panic "mount pvebase failed"
 		mount -t overlay -o lowerdir=/mnt/.base,upperdir=/mnt/.workdir/upper,workdir=/mnt/.workdir/work  none /root || panic "mount pvebase to /root failed"
 		mount -t devtmpfs devtmpfs /root/dev
 
 #判断hostname
 		if [ -n "$hostname" ];then
-			echo "$hostname" >/root/etc/hosts
+			echo "$hostname" >/root/etc/hostname
 		fi
-
+		if [ -n "$dn" ];then
+			echo "$dn" >/root/etc/hostname
+		fi
+		sed -i "s/testlive.com/$dn/g" /root/etc/hosts
 #判断是否有pvedata
 		pvedata=$(blkid  -L pvedata|head -n 1)
 		if [ ! -n "$pvedata" ];then
