@@ -39,7 +39,7 @@ modify_hostname(){
 	echo "modify hostname"
     cat << EOF > $rootfssrc/etc/hosts
 127.0.0.1 localhost.localdomain localhost
-10.10.10.10 pve.pvelive.com pve
+10.10.10.10 pve.testlive.com pve
 #The following lines are desirable for IPv6 capable hosts
 ::1     ip6-localhost ip6-loopback
 fe00::0 ip6-localnet
@@ -139,7 +139,7 @@ Options=defaults
 WantedBy=multi-user.target
 EOF
 mkdir $rootfssrc/etc/systemd/system/var-lib-pve\\x2dcluster.d
-cat > /etc/systemd/system/var-lib-pve\\x2dcluster.d/timeout.conf <<EOF
+cat > $rootfssrc/etc/systemd/system/var-lib-pve\\x2dcluster.d/timeout.conf <<EOF
 [Mount]
 
 TimeoutSec=5s
