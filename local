@@ -169,15 +169,6 @@ local_mount_root()
 		mount -t overlay -o lowerdir=/mnt/live/.live,upperdir=/mnt/live/.liveworkdir/upper,workdir=/mnt/live/.liveworkdir/work  none /root || panic "mount pvelive to /root failed"
 		mount -t devtmpfs devtmpfs /root/dev
 
-#判断hostname和dn
-		hostn=`sed "s/ /\n/g" /proc/cmdline |grep hostname`
-		if [ ! -z $hostn ];then
-			echo `hostname` >/root/etc/hostname
-			sed -i "s/pve/`hostname`/g" /root/etc/hosts
-		fi
-		if [ -n "$dn" ];then
-			sed -i "s/testlive.com/$dn/g" /root/etc/hosts
-		fi
 #判断是否有pvedata
 		pvedata=$(blkid  -L pvedata|head -n 1)
 		if [ ! -n "$pvedata" ];then
