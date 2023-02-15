@@ -125,7 +125,7 @@ prepare_rootfs_mount || errlog "rootfs env mount  failed"
 debconfig_set
 debconfig_write
 chroot $targetdir apt update 
-LC_ALL=C DEBIAN_FRONTEND=noninteractive chroot $targetdir  apt install proxmox-ve -y  bash-completion ksmtuned wget curl vim iputils-* locales || echo  "proxmox-ve install  failed but ok"
+LC_ALL=C DEBIAN_FRONTEND=noninteractive chroot $targetdir  apt install -y  proxmox-ve grub-efi grub-efi-amd64-bin grub-efi-amd64-signed bash-completion ksmtuned wget curl vim iputils-* locales || echo  "proxmox-ve install  failed but ok"
 modify_proxmox_boot_sync
 #fix kernel postinstall error
 mv $targetdir/var/lib/dpkg/info/pve-kernel-*.postinst ./
@@ -165,13 +165,16 @@ chroot $targetdir systemctl enable 'var-lib-pve\x2dcluster.mount'
 chmod 1777 $targetdir/var/tmp
 
 # copy rc.local
-cp ../etc/* $targetdir/etc/
+cp -r ../etc/* $targetdir/etc/
 chmod +x $targetdir/etc/rc.local
 chmod +x $targetdir/etc/pvelive/*
 
 
 # enable sshd
 enable_ssh
+
+#clean passwd
+passwd -d root
 
 prepare_rootfs_umount
 

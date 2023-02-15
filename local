@@ -155,7 +155,6 @@ local_mount_root()
 			mount -t auto -o loop,ro $pvelive /mnt || panic "mount proxmoxdisk failed"
 		fi
 
-
 #判断是否有tmpfssize，如果有则设置tmpfssize
 		if [ ! -n "$tmpfssize" ];then
 			mount -t tmpfs tmpfs /mnt/live || panic "mount tmpfs failed"
