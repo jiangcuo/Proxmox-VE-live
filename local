@@ -158,21 +158,22 @@ local_mount_root()
 
 #判断是否有tmpfssize，如果有则设置tmpfssize
 		if [ ! -n "$tmpfssize" ];then
-			mount -t tmpfs tmpfs /mnt/.workdir || panic "mount tmpfs failed"
+			mount -t tmpfs tmpfs /mnt/live || panic "mount tmpfs failed"
 		else
-			mount -t tmpfs -o size=$tmpfssize tmpfs /mnt/.workdir || panic  "mount tmpfs with size $tmpfssize failed"
+			mount -t tmpfs -o size=$tmpfssize tmpfs /mnt/live || panic  "mount tmpfs with size $tmpfssize failed"
 		fi
 
 #创建overlay挂载
-		mkdir /mnt/.liveworkdir/upper /mnt/.liveworkdir/work /mnt/.live  -p
-		mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /mnt/.live || panic "mount pvelive failed"
-		mount -t overlay -o lowerdir=/mnt/.live,upperdir=/mnt/.liveworkdir/upper,workdir=/mnt/.liveworkdir/work  none /root || panic "mount pvelive to /root failed"
+		mkdir /mnt/live/.liveworkdir/upper /mnt/live/.liveworkdir/work /mnt/live/.live  -p
+		mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /mnt/live/.live || panic "mount pvelive failed"
+		mount -t overlay -o lowerdir=/mnt/live/.live,upperdir=/mnt/live/.liveworkdir/upper,workdir=/mnt/live/.liveworkdir/work  none /root || panic "mount pvelive to /root failed"
 		mount -t devtmpfs devtmpfs /root/dev
 
 #判断hostname和dn
-		if [ -n "$hostname" ];then
-			echo "$hostname" >/root/etc/hostname
-			sed -i "s/pve/$hostname/g" /root/etc/hosts
+		hostn=`sed "s/ /\n/g" /proc/cmdline |grep hostname`
+		if [ ! -z $hostn ];then
+			echo `hostname` >/root/etc/hostname
+			sed -i "s/pve/`hostname`/g" /root/etc/hosts
 		fi
 		if [ -n "$dn" ];then
 			sed -i "s/testlive.com/$dn/g" /root/etc/hosts
