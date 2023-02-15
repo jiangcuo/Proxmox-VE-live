@@ -2,7 +2,7 @@
 #create rootfs
 arch="amd64"
 release="bullseye"
-targetdir="/tmp/targetdir"
+targetdir="/targetdir"
 targetdirsqu="/root/pve-base.squ"
 
 prepare_rootfs_mount(){
@@ -166,6 +166,10 @@ chmod 1777 $targetdir/var/tmp
 cp ../etc/* $targetdir/etc/
 chmod +x $targetdir/etc/rc.local
 chmod +x $targetdir/etc/pvelive/*
+
+
+# enable sshd
+enable_ssh
 
 prepare_rootfs_umount
 

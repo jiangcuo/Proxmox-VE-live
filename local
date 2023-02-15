@@ -164,19 +164,19 @@ local_mount_root()
 		fi
 
 #创建overlay挂载
-		mkdir /mnt/.workdir/upper /mnt/.workdir/work /mnt/.base .workdir
-		mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /mnt/.base || panic "mount pvebase failed"
-		mount -t overlay -o lowerdir=/mnt/.base,upperdir=/mnt/.workdir/upper,workdir=/mnt/.workdir/work  none /root || panic "mount pvebase to /root failed"
+		mkdir /mnt/.liveworkdir/upper /mnt/.liveworkdir/work /mnt/.live  -p
+		mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /mnt/.live || panic "mount pvelive failed"
+		mount -t overlay -o lowerdir=/mnt/.live,upperdir=/mnt/.liveworkdir/upper,workdir=/mnt/.liveworkdir/work  none /root || panic "mount pvelive to /root failed"
 		mount -t devtmpfs devtmpfs /root/dev
 
-#判断hostname
+#判断hostname和dn
 		if [ -n "$hostname" ];then
 			echo "$hostname" >/root/etc/hostname
+			sed -i "s/pve/$hostname/g" /root/etc/hosts
 		fi
 		if [ -n "$dn" ];then
-			echo "$dn" >/root/etc/hostname
+			sed -i "s/testlive.com/$dn/g" /root/etc/hosts
 		fi
-		sed -i "s/testlive.com/$dn/g" /root/etc/hosts
 #判断是否有pvedata
 		pvedata=$(blkid  -L pvedata|head -n 1)
 		if [ ! -n "$pvedata" ];then
