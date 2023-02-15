@@ -159,6 +159,8 @@ cat > $targetdir/etc/systemd/system/var-lib-pve\\x2dcluster.d/timeout.conf <<EOF
 TimeoutSec=5s
 
 EOF
+
+chroot $targetdir systemctl enable 'var-lib-pve\x2dcluster.mount'
 #fix upload cdrom error
 chmod 1777 $targetdir/var/tmp
 
