@@ -14,4 +14,5 @@ if [ ! -z $dn ];then
 	echo "define the dn,do config dn"
 	sed -i "s/testlive.com/$dn/g" /etc/hosts
 fi
+systemctl restart pvebanner.service 
 exit 0

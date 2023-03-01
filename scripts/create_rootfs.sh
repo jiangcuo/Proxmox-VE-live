@@ -125,7 +125,7 @@ prepare_rootfs_mount || errlog "rootfs env mount  failed"
 debconfig_set
 debconfig_write
 chroot $targetdir apt update 
-LC_ALL=C DEBIAN_FRONTEND=noninteractive chroot $targetdir  apt install -y  proxmox-ve grub-efi grub-efi-amd64-bin grub-efi-amd64-signed bash-completion ksmtuned wget curl vim iputils-* locales || echo  "proxmox-ve install  failed but ok"
+LC_ALL=C DEBIAN_FRONTEND=noninteractive chroot $targetdir  apt install -y  proxmox-ve btrfs-progs grub-efi grub-efi-amd64-bin grub-efi-amd64-signed bash-completion ksmtuned wget curl vim iputils-* locales || echo  "proxmox-ve install  failed but ok"
 modify_proxmox_boot_sync
 #fix kernel postinstall error
 mv $targetdir/var/lib/dpkg/info/pve-kernel-*.postinst ./

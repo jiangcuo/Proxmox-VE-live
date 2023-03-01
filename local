@@ -145,7 +145,7 @@ local_mount_root()
 {
 	local_top
 	if [ -z "${ROOT}" ]; then
-		mkdir /mnt
+		mkdir /live /mnt -p
 		mount -nt proc proc /proc
 #如果识别到pxe启动的proxmox-live.iso，则将这个iso挂载。如果是本地启动，则将Lable为PVE的盘挂载。
 		pvelive=$(blkid  -L PVE|head -n 1)
@@ -154,18 +154,26 @@ local_mount_root()
 		else
 			mount -t auto -o loop,ro $pvelive /mnt || panic "mount proxmoxdisk failed"
 		fi
-
 #判断是否有tmpfssize，如果有则设置tmpfssize
 		if [ ! -n "$tmpfssize" ];then
-			mount -t tmpfs tmpfs /mnt/live || panic "mount tmpfs failed"
+			mount -t tmpfs tmpfs /live || panic "mount tmpfs failed"
 		else
-			mount -t tmpfs -o size=$tmpfssize tmpfs /mnt/live || panic  "mount tmpfs with size $tmpfssize failed"
+			mount -t tmpfs -o size=$tmpfssize tmpfs /live || panic  "mount tmpfs with size $tmpfssize failed"
 		fi
-
-#创建overlay挂载
-		mkdir /mnt/live/.liveworkdir/upper /mnt/live/.liveworkdir/work /mnt/live/.live  -p
-		mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /mnt/live/.live || panic "mount pvelive failed"
-		mount -t overlay -o lowerdir=/mnt/live/.live,upperdir=/mnt/live/.liveworkdir/upper,workdir=/mnt/live/.liveworkdir/work  none /root || panic "mount pvelive to /root failed"
+# 创建挂载点
+		mkdir /live/.liveworkdir/upper /live/.liveworkdir/work /live/.live  -p
+#判断内存大小，如果小于3G，则启用U盘挂载，如果大于3G，则使用内存挂载
+		mem=`cat /proc/meminfo |grep MemTotal|awk '{print $2}'`
+		sgmem="5000000"
+		if [ "$mem" -lt "$sgmem" ];then
+			echo "memory is lower"
+			mount -t squashfs -o ro,loop "/mnt/pve-live.squashfs" /live/.live || panic "mount pvelive failed"
+		else
+			cp /mnt/pve-live.squashfs /live/
+			umount /mnt 
+			mount -t squashfs -o ro,loop "/live/pve-live.squashfs" /live/.live || panic "mount pvelive failed"
+		fi
+		mount -t overlay -o lowerdir=/live/.live,upperdir=/live/.liveworkdir/upper,workdir=/live/.liveworkdir/work  none /root || panic "mount pvelive to /root failed"
 		mount -t devtmpfs devtmpfs /root/dev
 
 #判断是否有pvedata
