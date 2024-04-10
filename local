@@ -147,6 +147,8 @@ local_mount_root()
 	if [ -z "${ROOT}" ]; then
 		mkdir /live /mnt -p
 		mount -nt proc proc /proc
+		# wait usb ready
+		sleep 3s
 #如果识别到pxe启动的proxmox-live.iso，则将这个iso挂载。如果是本地启动，则将Lable为PVE的盘挂载。
 		pvelive=$(blkid  -L PVE|head -n 1)
 		if [ -f /proxmox-live.iso ];then
