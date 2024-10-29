@@ -1,0 +1,12 @@
+Source: pvelive
+Section: admin
+Priority: optional
+Build-Depends: debhelper-compat (= 13),
+Maintainer: Lierfang Team <service@lierfang.com>
+Standards-Version: 0.1
+
+Package: pvelive
+Architecture: loong64 arm64 amd64 riscv64 loongarch64
+Depends: libc6
+Description: 
+ Run proxmox on RAMOS

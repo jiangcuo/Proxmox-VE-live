@@ -1,0 +1,11 @@
+[Unit]
+Description=Mount System Backups Directory
+
+[Mount]
+What=/dev/disk/by-label/pvedata
+Where=-var-lib-pve\x2dcluster
+Type=auto
+Options=defaults
+
+[Install]
+WantedBy=multi-user.target

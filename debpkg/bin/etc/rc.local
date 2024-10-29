@@ -1,0 +1,5 @@
+#!/bin/bash
+bash /etc/pvelive/network.sh &
+bash /etc/pvelive/password.sh &
+bash /etc/pvelive/hosts.sh &
+exit 0

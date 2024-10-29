@@ -1,0 +1,7 @@
+/etc/modprobe.d/blacklist.conf
+/etc/pvelive/hosts.sh
+/etc/pvelive/network.sh
+/etc/pvelive/password.sh
+/etc/rc.local
+/etc/systemd/system/var-lib-pve\x2dcluster.d/timeout.conf
+/etc/systemd/system/var-lib-pve\x2dcluster.mount

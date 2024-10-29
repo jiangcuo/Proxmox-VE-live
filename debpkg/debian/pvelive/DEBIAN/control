@@ -1,0 +1,10 @@
+Package: pvelive
+Version: 0.1
+Architecture: amd64
+Maintainer: Lierfang Team <service@lierfang.com>
+Installed-Size: 32
+Depends: libc6
+Section: admin
+Priority: optional
+Description:
+ Run proxmox on RAMOS

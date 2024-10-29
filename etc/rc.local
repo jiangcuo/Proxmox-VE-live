@@ -1,5 +1,0 @@
-#!/bin/bash
-for scripts in `ls /etc/pvelive/*.sh`;do
-bash $scripts &
-done
-exit 0
